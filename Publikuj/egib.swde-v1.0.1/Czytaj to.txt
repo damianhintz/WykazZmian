@@ -1,0 +1,110 @@
+﻿egib.swde.dll v1.0.1 - Biblioteka do odczytu formatu SWDE 2.0
+Data publikacji: 3 kwietnia 2014
+
+Nowe funkcje:
+
+Poprawki:
+
+Zawiera także poprawione literówki, aktualizację dokumentacji oraz trywialne oczyszczanie kodu.
+
+** Zmiany (historia)
+Do zrobienia
+
+2014-04-03 v1.0.1
+* aktualizacja: możliwość odczytania/iteracji wszystkich atrybutów obiektu SWDE
+* poprawka: pomijanie archiwalnych obiektów
+
+2014-01-27 v1.0
+* nowa funkcja: możliwość określenia zapisu współrzędnych w pliku SWDE: geodezyjny czy matematyczny (dotyczy geometrii obiektów)
+
+** Analiza/Wymagania
+
+** Metafora
+
+Architekt systemu -> Budowniczy/Konstruktor -> Fabryka komponentów
+
+Architekt przekazuje plan budowy "systemu" konstruktorowi budowy (budowniczemu), który zleca budowę
+potrzebnych komponentów fabryce. Otrzymane komponenty łączone są przez konstruktora w całość.
+Rezultat w postaci gotowego systemu zwracany jest architektowi.
+
+Architektem jest SwdeReader.
+Konstruktorem jest BudowniczySwde.
+Fabryką jest FabrykaKomponentow.
+Planem systemu jest plik swde (File).
+Systemem jest DokumentSwde.
+
+** Koncepcja
+
+Wczytanie i utworzenie ogólnego modelu swde, tylko typy bazowe (opisowe, punktowe, liniowe itd).
+Opierając się na tym modelu budujemy reprezentację schematu "G5". Kolejnym etapem jest
+mapowanie tego modelu na "Ogólny model geodezyjny". Zadaniem projektu Egib.Swde jest 
+przygotowanie pierwszych trzech etapów w oparciu o projekt Egib.Model.
+Czwartym i ostatnim krokiem jest konwersja tego modelu na gml.
+
+** Projekt
+
+ Główne wzorce projektowe kompozyt, wizytator, budowniczy, obserwator.
+ Prosta fabryka, metoda szablonowa.
+ Wzorzec repozytorium.
+
+ Wzorzec repozytorium miał pomóc w obsłudze baz danych oraz wersjonowania, z uwagi jednak na to że
+ nie wprowadzono żadnej z tych koncepcji, zrezygnowano z tego wzorca.
+
+ Nie zastosowano wzorca wizytator i obserwator, które i tak skomplikowałyby już istniejący interfejs.
+ Zastosowano zamiast tego wzorzec fasada do uproszczenia złożonego modelu pliku SWDE.
+ Większość niskopoziomowych klas modelu SWDE otrzymała poziom widoczności internal, w zestawie 
+ udostępniono publicznie mniejszą ilość prostszych w użyciu klas wyższego poziomu.
+
+** Implementacja
+
+* Analiza leksykalna (składnia)
+ - ParseSwdeException, na najniższym poziomie, czyli fabryki komponentów,
+
+* Synteza komponentów (semantyka)
+ - InvalidOperationException, na poziomie składania komponentów,
+
+* Konstrukcja modelu G5
+ Zrezygnowano ze stworzenia pełnego interfejsu G5 pośredniczącego w dostępnie do ogólnego modelu SWDE.
+ Zamiast tego jest bardziej ogólny model z możliwością określenia wersji SWDE (Ogólna, 2.0 lub 3.0).
+
+* Konstrukcja ogólnego modelu geodezyjnego
+ Przeniesiono odpowiedzialność za ten proces do projektu Egib.Gml (przestrzeń Egib.Gml.Swde).
+
+** Klasy
+
+* ParseSwdeException
+* InvalidOperationException (systemowa)
+
+* KontrolerKontekstu, 
+ - logowanie błędów, 
+ + zmiana nazwy na "Zapewnij",
+ + lokalizacja kontroli, przeniesienie kontroli komponentu z KontrolerKontekstu do SwdeReader,
+
+* FabrykaKomponentow
+ Przekształca/obiektuje reprezentację tekstową elementów pliku swde na obiekty.
+ Symbol reprezentuje pojedynczą linię w pliku swde oraz posiada atrybuty opisujące tą linię.
+ Konstruowane komponenty przekazywane są do budowniczego, który z przekazywanych komponentów
+ tworzy bardziej złożone obiekty oraz analizuje poprawność kontekstu dla każdego symbolu.
+ 
+* KomponentBase,
+ + refaktoryzacja metody PrzekazDoBudowy (coś tu jest nie tak),
+ - koncepcja terminatora może zostać uproszczona, jeżeli wszystkie będziemy traktować jednolicie,
+ i nie będzie nam zależało na kontroli typu terminatora komponentu
+ (przymykamy oko na to jak są zakończone, ważne jest tylko aby były zakończone),
+ + LiniaSwde oraz ObszarSwde nadal wymaga analizy, czy traktować je niezależnie?,
+ + SegmentSwde jest zbędny,
+ + AgregatSwdeBase jest zbędny,
+
+* BudowniczySwde
+
+* SwdeReader
+
+* DokumentSwde
+ Dostęp, wyszukiwanie obiektów pliku SWDE reprezentowanych przez klasę ObiektSwde.
+
+* ObiektSwde
+ Ogólny obiekt pliku SWDE, pośredniczy w dostępnie do RekordSwdeBase.
+ Dostęp do atrybutów, relacji, obiektów powiązanych.
+
+* GeometriaSwde
+ Reprezentacja geometrii obiektu SWDE w postacji WKT.

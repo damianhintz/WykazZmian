@@ -1,0 +1,19 @@
+﻿Pragmatic.Kontrakty v1.1.1 - Biblioteka wspierająca programowanie kontraktowe
+Data publikacji: 16 stycznia 2015
+
+Nowe funkcje:
+
+** Zmiany (historia)
+Do zrobienia
+
+2015-05-15 v1.1.1
+* aktualizacja: szara uwaga
+
+2015-01-16 v1.1
+* moduł logowania błędów (Logger)
+
+2014-04-24 v1.0
+* pierwsza wersja
+
+2012-12-11 v1.0-beta
+* pierwsza wersja beta
